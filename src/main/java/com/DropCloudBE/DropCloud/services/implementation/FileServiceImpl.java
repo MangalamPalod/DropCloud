@@ -55,20 +55,20 @@ public class FileServiceImpl implements FileService {
                     try {
                         totalChunks++;
                         int finalBytesRead = chunkSize;
-                        completionService.submit(()->writeChunk(outputStream, buffer, finalBytesRead));
+                        completionService.submit(() -> writeChunk(outputStream, buffer, finalBytesRead));
                     } catch (Exception e) {
                         deleteFile();
                         throw new RuntimeException("Failed to upload the file");
                     }
                 }
 
-                while(totalChunks>0){
+                while (totalChunks > 0) {
                     Future<ResponseEntity<String>> future = completionService.take();
-                    if(future!=null){
-                        ResponseEntity<String> response= future.get();
-                        if(response.getStatusCode().is2xxSuccessful()){
+                    if (future != null) {
+                        ResponseEntity<String> response = future.get();
+                        if (response.getStatusCode().is2xxSuccessful()) {
                             return null;
-                        }else{
+                        } else {
                             return null;
                         }
                     }
@@ -111,7 +111,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Retryable(value = RuntimeException.class, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2))
-    private ResponseEntity<String> writeChunk(OutputStream outputStream, byte[] buffer, int bytesRead) {
+    private ResponseEntity<String> writeChunk(OutputStream outputStream, byte[] buffer, int bytesRead) { //Need to define a new DTO containing the Chunk information ,offset information.
         try {
             outputStream.write(buffer, 0, bytesRead);
         } catch (IOException e) {
